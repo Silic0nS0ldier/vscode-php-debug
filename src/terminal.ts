@@ -108,7 +108,7 @@ class WindowsTerminalService extends DefaultTerminalService {
             const cmdArgs = ['/c', 'start', title, '/wait', 'cmd.exe', '/c', command]
 
             // merge environment variables into a copy of the process.env
-            const env = extendObject(extendObject({}, process.env), envVars)
+            const env = Object.assign({}, process.env, envVars)
 
             const options: any = {
                 cwd: dir,
@@ -170,7 +170,7 @@ class LinuxTerminalService extends DefaultTerminalService {
             ]
 
             // merge environment variables into a copy of the process.env
-            const env = extendObject(extendObject({}, process.env), envVars)
+            const env = Object.assign({}, process.env, envVars)
 
             const options: any = {
                 env: env,
@@ -241,16 +241,4 @@ class MacTerminalService extends DefaultTerminalService {
             })
         })
     }
-}
-
-// ---- private utilities ----
-
-function extendObject<T>(objectCopy: T, object: T): T {
-    for (let key in object) {
-        if (object.hasOwnProperty(key)) {
-            ;(<any>objectCopy)[key] = (<any>object)[key]
-        }
-    }
-
-    return objectCopy
 }

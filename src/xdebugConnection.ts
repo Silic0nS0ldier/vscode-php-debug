@@ -346,7 +346,7 @@ export class SourceResponse extends Response {
     source: string
     constructor(document: XMLDocument, connection: Connection) {
         super(document, connection)
-        this.source = new Buffer(document.documentElement.textContent!, 'base64').toString()
+        this.source = Buffer.from(document.documentElement.textContent!, 'base64').toString()
     }
 }
 
@@ -673,7 +673,7 @@ export class Connection extends DbgpConnection {
             commandString += ' ' + command.args
         }
         if (command.data) {
-            commandString += ' -- ' + new Buffer(command.data).toString('base64')
+            commandString += ' -- ' + Buffer.from(command.data).toString('base64')
         }
         commandString += '\0'
         const data = iconv.encode(commandString, ENCODING)

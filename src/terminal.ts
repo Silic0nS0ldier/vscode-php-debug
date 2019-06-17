@@ -18,7 +18,7 @@ export class Terminal {
         return this.terminalService().launchInTerminal(dir, args, envVars)
     }
 
-    public static killTree(processId: number): Promise<any> {
+    public static killTree(processId: number): Promise<void> {
         return this.terminalService().killTree(processId)
     }
 
@@ -47,7 +47,7 @@ export class Terminal {
 
 interface ITerminalService {
     launchInTerminal(dir: string, args: string[], envVars: { [key: string]: string }): Promise<CP.ChildProcess>
-    killTree(pid: number): Promise<any>
+    killTree(pid: number): Promise<void>
     isOnPath(program: string): boolean
 }
 
@@ -58,13 +58,13 @@ class DefaultTerminalService implements ITerminalService {
         throw new Error('launchInTerminal not implemented')
     }
 
-    public killTree(pid: number): Promise<any> {
+    public killTree(pid: number): Promise<void> {
         // on linux and OS X we kill all direct and indirect child processes as well
 
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             try {
                 const cmd = Path.join(__dirname, './terminateProcess.sh')
-                const result = (<any>CP).spawnSync(cmd, [pid.toString()])
+                const result = CP.spawnSync(cmd, [pid.toString()])
                 if (result.error) {
                     reject(result.error)
                 } else {
@@ -110,7 +110,7 @@ class WindowsTerminalService extends DefaultTerminalService {
             // merge environment variables into a copy of the process.env
             const env = Object.assign({}, process.env, envVars)
 
-            const options: any = {
+            const options: CP.SpawnOptions = {
                 cwd: dir,
                 env: env,
                 windowsVerbatimArguments: true,
@@ -123,11 +123,11 @@ class WindowsTerminalService extends DefaultTerminalService {
         })
     }
 
-    public killTree(pid: number): Promise<any> {
+    public killTree(pid: number): Promise<void> {
         // when killing a process in Windows its child processes are *not* killed but become root processes.
         // Therefore we use TASKKILL.EXE
 
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             const cmd = `taskkill /F /T /PID ${pid}`
             try {
                 CP.execSync(cmd)
@@ -172,7 +172,7 @@ class LinuxTerminalService extends DefaultTerminalService {
             // merge environment variables into a copy of the process.env
             const env = Object.assign({}, process.env, envVars)
 
-            const options: any = {
+            const options: CP.SpawnOptions = {
                 env: env,
             }
 

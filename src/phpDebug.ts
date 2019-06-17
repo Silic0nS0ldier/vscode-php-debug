@@ -14,7 +14,7 @@ import minimatch = require('minimatch')
 
 if (process.env['VSCODE_NLS_CONFIG']) {
     try {
-        moment.locale(JSON.parse(process.env['VSCODE_NLS_CONFIG']).locale)
+        moment.locale(JSON.parse(process.env['VSCODE_NLS_CONFIG'] || '{}').locale)
     } catch (e) {
         // ignore
     }
@@ -217,7 +217,7 @@ class PhpDebugSession extends vscode.DebugSession {
                 const script = await Terminal.launchInTerminal(
                     cwd,
                     [runtimeExecutable, ...runtimeArgs, args.program!, ...programArgs],
-                    env
+                    env as { [key: string]: string }
                 )
                 // we only do this for CLI mode. In normal listen mode, only a thread exited event is send.
                 script.on('exit', () => {
